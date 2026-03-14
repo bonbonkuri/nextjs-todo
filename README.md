@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todoリスト
 
-## Getting Started
+Next.js App Router を使ったシンプルなTodoアプリです。
 
-First, run the development server:
+## 技術スタック
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Server Actions** — フォーム送信・データ操作
+- **JSONファイル** — データの永続化
+
+## 機能
+
+- タスクの追加
+- タスクの完了 / 未完了の切り替え
+- タスクの削除
+- 進捗バー（完了数 / 全体数）
+
+## ディレクトリ構成
+
+```
+nextjs-todo/
+├── app/
+│   ├── actions.ts           # Server Actions（追加・切替・削除）
+│   ├── layout.tsx           # ルートレイアウト
+│   ├── page.tsx             # メインページ（Server Component）
+│   ├── globals.css
+│   └── components/
+│       └── TodoItem.tsx     # Todoアイテム（Client Component）
+└── data/
+    └── todos.json           # データ永続化
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## セットアップ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 依存関係のインストール
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 開発サーバーの起動
+npm run dev
+```
 
-## Learn More
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてください。
 
-To learn more about Next.js, take a look at the following resources:
+## ビルド
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 実装のポイント
 
-## Deploy on Vercel
+### Server Actions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+データの変更（追加・完了切替・削除）はすべて Server Actions で処理します。クライアント側に API ルートは不要です。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```ts
+// app/actions.ts
+'use server'
+export async function addTodo(formData: FormData) {
+  // サーバー側でデータを更新
+  revalidatePath('/')
+}
+```
+
+### Server Component と Client Component の分離
+
+- `page.tsx` — データ取得を行う Server Component
+- `TodoItem.tsx` — ユーザー操作を受け付ける Client Component (`'use client'`)
